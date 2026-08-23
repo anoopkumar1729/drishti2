@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Drishti — AI Diagnostic Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0B1220;
+    --surface: #121B2E;
+    --surface-2: #17233A;
+    --line: #2B3A54;
+    --text: #E7EDF5;
+    --muted: #8695AD;
+    --teal: #2DD4BF;
+    --amber: #F5A623;
+    --radius: 14px;
+  }
+
+  *{ box-sizing: border-box; margin:0; padding:0; }
+  html{ scroll-behavior: smooth; }
+
+  body{
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  h1,h2,h3{
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .mono{ font-family: 'IBM Plex Mono', monospace; }
+
+  a{ color: inherit; text-decoration: none; }
+
+  .wrap{
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 32px;
+  }
+
+  /* ---------- NAV ---------- */
+  header{
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    backdrop-filter: blur(10px);
+    background: rgba(11,18,32,0.85);
+    border-bottom: 1px solid var(--line);
+  }
+  nav{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding: 18px 32px;
+    max-width: 1180px;
+    margin: 0 auto;
+  }
+  .logo{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    font-size: 1.25rem;
+    letter-spacing: -0.02em;
+  }
+  .logo-mark{
+    width: 22px; height:22px;
+    border-radius: 50%;
+    border: 2px solid var(--teal);
+    position: relative;
+    flex-shrink:0;
+  }
+  .logo-mark::after{
+    content:'';
+    position:absolute;
+    inset: 5px;
+    border-radius:50%;
+    background: var(--teal);
+    box-shadow: 0 0 10px var(--teal);
+  }
+  .nav-links{
+    display:flex;
+    gap: 32px;
+    font-size: 0.9rem;
+    color: var(--muted);
+  }
+  .nav-links a:hover{ color: var(--text); }
+  .nav-cta{
+    background: var(--teal);
+    color: #06231F;
+    padding: 10px 20px;
+    border-radius: 999px;
+    font-weight:600;
+    font-size: 0.85rem;
+    white-space: nowrap;
+  }
+  .nav-mobile-toggle{ display:none; }
+
+  @media (max-width: 860px){
+    .nav-links{ display:none; }
+  }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    padding: 90px 0 70px;
+    position: relative;
+  }
+  .hero-grid{
+    display:grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: 56px;
+    align-items:center;
+  }
+  @media (max-width: 940px){
+    .hero-grid{ grid-template-columns: 1fr; }
+  }
+
+  .eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--teal);
+    border: 1px solid rgba(45,212,191,0.3);
+    background: rgba(45,212,191,0.08);
+    padding: 6px 12px;
+    border-radius: 999px;
+    margin-bottom: 22px;
+  }
+  .eyebrow-dot{
+    width:6px; height:6px; border-radius:50%;
+    background: var(--teal);
+    box-shadow: 0 0 8px var(--teal);
+  }
+
+  .hero h1{
+    font-size: clamp(2.2rem, 4.4vw, 3.4rem);
+    line-height: 1.08;
+    margin-bottom: 22px;
+  }
+  .hero h1 .accent{ color: var(--teal); }
+
+  .hero p.lead{
+    color: var(--muted);
+    font-size: 1.08rem;
+    max-width: 480px;
+    margin-bottom: 34px;
+  }
+
+  .hero-ctas{
+    display:flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .btn-primary{
+    background: var(--teal);
+    color: #06231F;
+    padding: 14px 26px;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    display:inline-block;
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .btn-primary:hover{ transform: translateY(-2px); box-shadow: 0 8px 24px rgba(45,212,191,0.25); }
+  .btn-ghost{
+    border: 1px solid var(--line);
+    color: var(--text);
+    padding: 14px 26px;
+    border-radius: 999px;
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: border-color .15s ease, background .15s ease;
+  }
+  .btn-ghost:hover{ border-color: var(--teal); background: rgba(45,212,191,0.06); }
+
+  .hero-note{
+    margin-top: 26px;
+    font-size: 0.8rem;
+    color: var(--muted);
+    font-family:'IBM Plex Mono', monospace;
+  }
+
+  /* ---------- SCAN VISUAL (signature element) ---------- */
+  .scan-panel{
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .scan-panel-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--muted);
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--line);
+  }
+  .scan-panel-head .live{
+    display:flex; align-items:center; gap:6px;
+    color: var(--amber);
+  }
+  .live-dot{
+    width:6px; height:6px; border-radius:50%;
+    background: var(--amber);
+    animation: pulse-dot 1.6s ease-in-out infinite;
+  }
+  @keyframes pulse-dot{
+    0%,100%{ opacity:1; } 50%{ opacity:0.3; }
+  }
+
+  .scan-stage{
+    position: relative;
+    height: 360px;
+    border-radius: 10px;
+    background:
+      radial-gradient(ellipse at 50% 40%, #16233a 0%, #0d1626 70%);
+    overflow: hidden;
+  }
+  .scan-grid{
+    position:absolute; inset:0;
+    background-image:
+      linear-gradient(rgba(139,163,199,0.07) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(139,163,199,0.07) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  .torso{
+    position:absolute;
+    left:50%; top:50%;
+    transform: translate(-50%,-50%);
+    width: 190px; height: 260px;
+  }
+  .torso svg{ width:100%; height:100%; display:block; }
+
+  .scan-line{
+    position:absolute;
+    left: 8%; right:8%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--teal), transparent);
+    box-shadow: 0 0 16px 2px var(--teal);
+    top: 10%;
+    animation: sweep 4s cubic-bezier(.65,0,.35,1) infinite;
+  }
+  @keyframes sweep{
+    0%{ top: 8%; opacity: 0; }
+    8%{ opacity: 1; }
+    48%{ top: 92%; opacity: 1; }
+    56%{ opacity: 0; }
+    100%{ top: 92%; opacity: 0; }
+  }
+
+  .finding{
+    position:absolute;
+    border: 1.5px solid var(--amber);
+    border-radius: 6px;
+    opacity: 0;
+    animation: reveal 4s ease infinite;
+  }
+  .finding-label{
+    position:absolute;
+    top: -22px; left: 0;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--amber);
+    white-space: nowrap;
+    background: rgba(11,18,32,0.85);
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid rgba(245,166,35,0.35);
+  }
+  .f1{ width:44px; height:34px; left: 40%; top:32%; animation-delay: 1.9s; }
+  .f2{ width:36px; height:36px; left: 30%; top:58%; animation-delay: 2.35s; }
+  @keyframes reveal{
+    0%,45%{ opacity:0; transform: scale(0.85); }
+    52%{ opacity:1; transform: scale(1); }
+    90%{ opacity:1; }
+    100%{ opacity:0; }
+  }
+
+  .scan-panel-foot{
+    margin-top: 14px;
+    display:flex;
+    justify-content:space-between;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+  }
+  .scan-panel-foot span.hl{ color: var(--teal); }
+
+  /* ---------- MARKET STRIP ---------- */
+  .stats-strip{
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    padding: 40px 0;
+  }
+  .stats-grid{
+    display:grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+  }
+  @media (max-width: 780px){
+    .stats-grid{ grid-template-columns: repeat(2,1fr); }
+  }
+  .stat-num{
+    font-family:'Space Grotesk', sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--teal);
+  }
+  .stat-label{
+    color: var(--muted);
+    font-size: 0.82rem;
+    margin-top: 6px;
+    max-width: 220px;
+  }
+
+  /* ---------- SECTION GENERIC ---------- */
+  section.block{ padding: 100px 0; }
+  .section-head{
+    max-width: 620px;
+    margin-bottom: 56px;
+  }
+  .section-head .eyebrow{ margin-bottom: 18px; }
+  .section-head h2{
+    font-size: clamp(1.7rem, 3vw, 2.3rem);
+    margin-bottom: 16px;
+  }
+  .section-head p{ color: var(--muted); font-size: 1rem; }
+
+  /* ---------- HOW IT WORKS ---------- */
+  .steps{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+  }
+  @media (max-width: 860px){ .steps{ grid-template-columns: 1fr; } }
+  .step{
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 30px 26px;
+    position: relative;
+  }
+  .step-index{
+    font-family:'IBM Plex Mono', monospace;
+    color: var(--teal);
+    font-size: 0.8rem;
+    margin-bottom: 18px;
+    display:block;
+  }
+  .step h3{ font-size: 1.15rem; margin-bottom: 10px; }
+  .step p{ color: var(--muted); font-size: 0.92rem; }
+  .step-arrow{
+    position:absolute;
+    right: -28px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--line);
+    font-size: 1.4rem;
+  }
+  @media (max-width: 860px){ .step-arrow{ display:none; } }
+
+  /* ---------- MODALITIES ---------- */
+  .modalities-grid{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  @media (max-width: 860px){ .modalities-grid{ grid-template-columns: repeat(2,1fr); } }
+  @media (max-width: 560px){ .modalities-grid{ grid-template-columns: 1fr; } }
+  .modality-card{
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 24px;
+    transition: border-color .15s ease, transform .15s ease;
+  }
+  .modality-card:hover{ border-color: var(--teal); transform: translateY(-3px); }
+  .modality-icon{
+    width: 38px; height:38px;
+    border-radius: 8px;
+    background: rgba(45,212,191,0.1);
+    display:flex; align-items:center; justify-content:center;
+    color: var(--teal);
+    margin-bottom: 16px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+  }
+  .modality-card h3{ font-size: 1rem; margin-bottom: 8px; }
+  .modality-card p{ color: var(--muted); font-size: 0.85rem; }
+
+  /* ---------- TRUST STRIP ---------- */
+  .trust{
+    background: var(--surface);
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .trust-inner{
+    display:grid;
+    grid-template-columns: repeat(4,1fr);
+    gap: 24px;
+    padding: 56px 0;
+  }
+  @media (max-width: 860px){ .trust-inner{ grid-template-columns: repeat(2,1fr); } }
+  .trust-item{ display:flex; gap: 14px; align-items:flex-start; }
+  .trust-mark{
+    width:34px; height:34px;
+    border-radius: 8px;
+    border: 1px solid var(--teal);
+    flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    color: var(--teal);
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+  }
+  .trust-item h4{ font-size: 0.92rem; margin-bottom: 4px; }
+  .trust-item p{ font-size: 0.8rem; color: var(--muted); }
+
+  /* ---------- PRICING ---------- */
+  .pricing-grid{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  @media (max-width: 900px){ .pricing-grid{ grid-template-columns: 1fr; } }
+  .price-card{
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 32px 28px;
+    display:flex;
+    flex-direction: column;
+  }
+  .price-card.featured{
+    border-color: var(--teal);
+    background: linear-gradient(180deg, rgba(45,212,191,0.06), transparent 40%);
+    position: relative;
+  }
+  .price-tag{
+    position:absolute;
+    top: -12px; left: 28px;
+    background: var(--teal);
+    color: #06231F;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 0.68rem;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-weight:600;
+  }
+  .price-card h3{ font-size: 1.1rem; margin-bottom: 6px; }
+  .price-card .price{
+    font-family:'Space Grotesk', sans-serif;
+    font-size: 1.8rem;
+    font-weight:700;
+    margin: 14px 0 6px;
+  }
+  .price-card .price span{ font-size: 0.85rem; color: var(--muted); font-weight:400; }
+  .price-card .price-sub{ color: var(--muted); font-size: 0.82rem; margin-bottom: 22px; }
+  .price-card ul{ list-style:none; margin-bottom: 28px; flex-grow:1; }
+  .price-card li{
+    font-size: 0.88rem;
+    color: var(--text);
+    padding: 9px 0;
+    border-top: 1px solid var(--line);
+    display:flex; gap:10px;
+  }
+  .price-card li::before{ content:'—'; color: var(--teal); }
+
+  /* ---------- CTA ---------- */
+  .cta-block{
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 64px 48px;
+    text-align:center;
+    margin: 0 32px 100px;
+    max-width: 1116px;
+    margin-left:auto; margin-right:auto;
+  }
+  .cta-block h2{ font-size: clamp(1.6rem, 3vw, 2.2rem); margin-bottom: 14px; }
+  .cta-block p{ color: var(--muted); max-width: 480px; margin: 0 auto 30px; }
+  .cta-form{
+    display:flex;
+    gap: 10px;
+    max-width: 420px;
+    margin: 0 auto;
+    flex-wrap: wrap;
+    justify-content:center;
+  }
+  .cta-form input{
+    flex:1;
+    min-width: 220px;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 13px 20px;
+    color: var(--text);
+    font-family:'Inter', sans-serif;
+    font-size: 0.9rem;
+  }
+  .cta-form input:focus{ outline: 2px solid var(--teal); outline-offset: 2px; }
+  .cta-form button{
+    background: var(--teal);
+    color: #06231F;
+    border:none;
+    padding: 13px 24px;
+    border-radius: 999px;
+    font-weight:600;
+    font-family:'Inter', sans-serif;
+    font-size: 0.9rem;
+    cursor:pointer;
+  }
+  .form-note{ font-size: 0.75rem; color: var(--muted); margin-top: 14px; }
+
+  /* ---------- FOOTER ---------- */
+  footer{
+    border-top: 1px solid var(--line);
+    padding: 40px 0;
+  }
+  .footer-inner{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .footer-inner p{ color: var(--muted); font-size: 0.82rem; }
+  .footer-links{ display:flex; gap: 24px; font-size: 0.82rem; color: var(--muted); }
+  .footer-links a:hover{ color: var(--text); }
+
+  @media (prefers-reduced-motion: reduce){
+    .scan-line, .finding, .live-dot{ animation: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <nav>
+    <div class="logo"><span class="logo-mark"></span>Drishti</div>
+    <div class="nav-links">
+      <a href="#how">How it works</a>
+      <a href="#modalities">Modalities</a>
+      <a href="#trust">Security</a>
+      <a href="#pricing">Pricing</a>
+    </div>
+    <a href="#waitlist" class="nav-cta">Request a demo</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow"><span class="eyebrow-dot"></span>AI diagnostic platform</div>
+      <h1>Catch what a tired shift <span class="accent">might miss.</span></h1>
+      <p class="lead">Drishti reads imaging, labs, and patient history together, and flags the findings worth a second look — before the patient leaves the building.</p>
+      <div class="hero-ctas">
+        <a href="#waitlist" class="btn-primary">Request a demo</a>
+        <a href="#how" class="btn-ghost">See how it works</a>
+      </div>
+      <div class="hero-note">// built for radiology, pathology &amp; primary care workflows</div>
+    </div>
+
+    <div class="scan-panel">
+      <div class="scan-panel-head">
+        <span>SCAN_FEED_04 · CHEST · AXIAL</span>
+        <span class="live"><span class="live-dot"></span>ANALYZING</span>
+      </div>
+      <div class="scan-stage">
+        <div class="scan-grid"></div>
+        <div class="torso">
+          <svg viewBox="0 0 190 260" fill="none">
+            <path d="M95 6C55 6 30 34 26 74C23 104 30 118 24 150C18 182 8 200 14 226C20 250 50 254 95 254C140 254 170 250 176 226C182 200 172 182 166 150C160 118 167 104 164 74C160 34 135 6 95 6Z"
+              stroke="#3B4A63" stroke-width="1.5" fill="#101B2E"/>
+            <path d="M95 40C80 40 68 54 66 74C64 96 70 108 66 128" stroke="#2B3A54" stroke-width="1" opacity="0.7"/>
+            <path d="M95 40C110 40 122 54 124 74C126 96 120 108 124 128" stroke="#2B3A54" stroke-width="1" opacity="0.7"/>
+            <circle cx="95" cy="150" r="3" fill="#2B3A54" opacity="0.6"/>
+          </svg>
+        </div>
+        <div class="scan-line"></div>
+        <div class="finding f1"><span class="finding-label">nodule · 94%</span></div>
+        <div class="finding f2"><span class="finding-label">opacity · 87%</span></div>
+      </div>
+      <div class="scan-panel-foot">
+        <span>Modality: <span class="hl">CT</span></span>
+        <span>Time to flag: <span class="hl">1.8s</span></span>
+        <span>Model: <span class="hl">drishti-v4</span></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="stats-strip">
+  <div class="wrap stats-grid">
+    <div>
+      <div class="stat-num">$800B</div>
+      <div class="stat-label">projected global digital health market by 2030 — the window to launch is now</div>
+    </div>
+    <div>
+      <div class="stat-num">38.6%</div>
+      <div class="stat-label">CAGR for AI in healthcare through 2030, up from a $26.6B base in 2024</div>
+    </div>
+    <div>
+      <div class="stat-num">81%</div>
+      <div class="stat-label">of physicians expect to use AI professionally in 2026, up from 38% in 2023</div>
+    </div>
+    <div>
+      <div class="stat-num">40%</div>
+      <div class="stat-label">improvement in early-detection accuracy reported with AI-assisted imaging review</div>
+    </div>
+  </div>
+</div>
+
+<section class="block" id="how">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow"><span class="eyebrow-dot"></span>Workflow</div>
+      <h2>Three steps, one read.</h2>
+      <p>Drishti slots into the workflow clinicians already use — it doesn't replace the radiologist, it clears the queue faster and flags what needs eyes first.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <span class="step-index">01 / INGEST</span>
+        <h3>Pull the full picture</h3>
+        <p>Imaging (X-ray, CT, MRI), lab results, and EHR history sync in automatically from existing hospital systems — no separate upload step.</p>
+        <span class="step-arrow">→</span>
+      </div>
+      <div class="step">
+        <span class="step-index">02 / ANALYZE</span>
+        <h3>Cross-reference, not just scan</h3>
+        <p>The model reads imaging alongside labs and history, so a borderline finding gets weighed against the patient's actual clinical context.</p>
+        <span class="step-arrow">→</span>
+      </div>
+      <div class="step">
+        <span class="step-index">03 / REPORT</span>
+        <h3>A flagged, explainable report</h3>
+        <p>Clinicians get an annotated report with confidence scores and the reasoning behind each flag — ready to confirm, adjust, or dismiss.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="modalities" style="padding-top:0;">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow"><span class="eyebrow-dot"></span>Coverage</div>
+      <h2>One platform, every input a diagnosis depends on.</h2>
+    </div>
+    <div class="modalities-grid">
+      <div class="modality-card">
+        <div class="modality-icon">X-R</div>
+        <h3>Radiography</h3>
+        <p>Chest, skeletal, and abdominal X-rays screened for fractures, opacities, and early masses.</p>
+      </div>
+      <div class="modality-card">
+        <div class="modality-icon">CT</div>
+        <h3>CT &amp; MRI</h3>
+        <p>Cross-sectional imaging reviewed slice by slice for nodules, lesions, and structural anomalies.</p>
+      </div>
+      <div class="modality-card">
+        <div class="modality-icon">LAB</div>
+        <h3>Lab panels</h3>
+        <p>Blood work and biomarkers checked against reference ranges and the patient's own trend history.</p>
+      </div>
+      <div class="modality-card">
+        <div class="modality-icon">EHR</div>
+        <h3>Patient history</h3>
+        <p>Prior visits, medications, and family history pulled in so findings are read in context, not isolation.</p>
+      </div>
+      <div class="modality-card">
+        <div class="modality-icon">PTH</div>
+        <h3>Pathology slides</h3>
+        <p>Digitized biopsy slides screened for cellular patterns that warrant a specialist's review.</p>
+      </div>
+      <div class="modality-card">
+        <div class="modality-icon">RPT</div>
+        <h3>Structured reporting</h3>
+        <p>Every flag comes with a plain-language explanation and confidence score, not just a number.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="trust" id="trust">
+  <div class="wrap trust-inner">
+    <div class="trust-item">
+      <div class="trust-mark">✓</div>
+      <div><h4>HIPAA-ready</h4><p>Data handling built to US clinical privacy standards from day one.</p></div>
+    </div>
+    <div class="trust-item">
+      <div class="trust-mark">✓</div>
+      <div><h4>GDPR-aligned</h4><p>Consent and storage rules mapped for hospitals operating in the EU.</p></div>
+    </div>
+    <div class="trust-item">
+      <div class="trust-mark">✓</div>
+      <div><h4>Encrypted at rest &amp; transit</h4><p>Patient records and imaging are encrypted end-to-end, always.</p></div>
+    </div>
+    <div class="trust-item">
+      <div class="trust-mark">✓</div>
+      <div><h4>Full audit trail</h4><p>Every AI flag, override, and confirmation is logged for compliance review.</p></div>
+    </div>
+  </div>
+</div>
+
+<section class="block" id="pricing">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow"><span class="eyebrow-dot"></span>Pricing</div>
+      <h2>Priced for how you'll actually use it.</h2>
+      <p>Start per-diagnosis, move to a flat subscription once volume makes sense.</p>
+    </div>
+    <div class="pricing-grid">
+      <div class="price-card">
+        <h3>Clinic</h3>
+        <div class="price">$2<span> / diagnosis</span></div>
+        <div class="price-sub">Pay only for what you screen. No minimums.</div>
+        <ul>
+          <li>Imaging + lab analysis</li>
+          <li>Standard turnaround (under 5s)</li>
+          <li>Email support</li>
+        </ul>
+        <a href="#waitlist" class="btn-ghost" style="text-align:center;">Start here</a>
+      </div>
+      <div class="price-card featured">
+        <div class="price-tag">MOST COMMON</div>
+        <h3>Hospital</h3>
+        <div class="price">$4,500<span> / month</span></div>
+        <div class="price-sub">Flat rate, unlimited screenings across departments.</div>
+        <ul>
+          <li>All modalities, unlimited volume</li>
+          <li>EHR + PACS integration</li>
+          <li>Dedicated onboarding &amp; support</li>
+          <li>Compliance &amp; audit reporting</li>
+        </ul>
+        <a href="#waitlist" class="btn-primary" style="text-align:center;">Request a demo</a>
+      </div>
+      <div class="price-card">
+        <h3>Enterprise</h3>
+        <div class="price">Custom</div>
+        <div class="price-sub">Multi-site health systems and research partners.</div>
+        <ul>
+          <li>Custom model tuning</li>
+          <li>Multi-facility deployment</li>
+          <li>SLA-backed uptime</li>
+        </ul>
+        <a href="#waitlist" class="btn-ghost" style="text-align:center;">Talk to us</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="cta-block" id="waitlist">
+  <h2>See it read a real scan.</h2>
+  <p>Book a 20-minute walkthrough with your own (anonymized) imaging, and we'll show you exactly what Drishti flags.</p>
+  <form class="cta-form" onsubmit="event.preventDefault(); this.querySelector('button').textContent='Request sent ✓';">
+    <input type="email" placeholder="you@hospital.org" required>
+    <button type="submit">Request a demo</button>
+  </form>
+  <p class="form-note">No cost, no commitment. We'll reply within one business day.</p>
+</div>
+
+<footer>
+  <div class="wrap footer-inner">
+    <p>© 2026 Drishti Health Technologies. Built for clinicians, not against them.</p>
+    <div class="footer-links">
+      <a href="#trust">Security</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#waitlist">Contact</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
